@@ -1,0 +1,98 @@
+{
+  "schema": "qwen-asr-opt-standard-benchmark-v1",
+  "created_at": "2026-09-17T14:04:45.234918+00:00",
+  "dataset": {
+    "name": "google/fleurs",
+    "revision": "168de341b3db6859a9bac1c50a2ef5e3b47647e0",
+    "split": "test",
+    "selection": "full en_us and ko_kr test splits; no sampling",
+    "license": "CC-BY-4.0",
+    "content_sha256": "2e221dddf607a64915a5d3904b32ff8d57019485e2eef998993daa4b22af6753",
+    "parquet": {
+      "en_us": {
+        "sha256": "6428a4d04d3aac29e16b45e039bb1470a8bd7aa334cf92f7984c9c520d1f234d",
+        "samples": 647,
+        "audio_s": 6387.9
+      },
+      "ko_kr": {
+        "sha256": "1a8319fc61c7996e8c15acde633786de97054e28ae1e463eb13901716176a7ec",
+        "samples": 382,
+        "audio_s": 4804.92
+      }
+    }
+  },
+  "model": {
+    "name": "Qwen/Qwen3-ASR-1.7B",
+    "source_revision": "7278e1e70fe206f11671096ffdd38061171dd6e5",
+    "profile": "q8 affine group-size 64",
+    "weights_sha256": "eba2bdb1ec74f5df99345f9f81492ba551f6b072eedfef564b353ef0dde90bb8"
+  },
+  "runtime": {
+    "backend": "mlx-qwen3-asr 0.4.0",
+    "mlx": "0.32.2",
+    "python": "3.12.13",
+    "decoder": "compiled greedy",
+    "batch_size": 4,
+    "batch_prefill": "serial",
+    "cache_mb": 256,
+    "dtype": "float16",
+    "language_hint": true,
+    "warmup_batches": 2,
+    "warmup_and_model_load_excluded": true
+  },
+  "hardware": {
+    "chip": "Apple M4 Pro",
+    "cpu_cores": 12,
+    "gpu_cores": 16,
+    "memory_bytes": 25769803776,
+    "os": "macOS 27.0",
+    "power_source": "AC Power",
+    "power_mode": 0
+  },
+  "scoring": {
+    "normalization": "NFKC, Unicode casefold, delete Unicode punctuation, collapse whitespace",
+    "english_primary": "corpus WER",
+    "korean_primary": "corpus CER after removing spaces",
+    "aggregation": "total edit errors divided by total reference units"
+  },
+  "results": {
+    "English": {
+      "samples": 647,
+      "audio_s": 6387.9,
+      "wer": 0.04197461999721099,
+      "word_errors": 602,
+      "reference_words": 14342,
+      "cer_no_space": 0.017238914777437893
+    },
+    "Korean": {
+      "samples": 382,
+      "audio_s": 4804.92,
+      "cer_no_space": 0.04394050783238138,
+      "char_errors_no_space": 777,
+      "reference_chars_no_space": 17683,
+      "wer": 0.10509497603408485
+    },
+    "total": {
+      "samples": 1029,
+      "audio_s": 11192.82,
+      "compute_s": 308.2296838309903,
+      "rtf": 0.02753816141338736,
+      "throughput_x": 36.31324491815425,
+      "truncated_samples": 0,
+      "mlx_peak_bytes": 3191806094,
+      "process_peak_rss_bytes": 2360180736
+    }
+  },
+  "validity": {
+    "power_source_stable": true,
+    "power_policy_stable": true,
+    "clock_windows_valid": true,
+    "source_changed_during_run": [],
+    "scope": "Timing validity checks cover clock agreement and power-state boundaries; they do not prove an otherwise idle system. No process-energy measurement was made."
+  },
+  "evidence": {
+    "benchmark_code_commit": "27e2470fcec00ad31d3a2c201307fbe5fd1e42e5",
+    "local_raw_report_sha256": "db1d083332953d28ea4e7a45f848a9b70a523d380fce96e6defc9a3b5a5ef351",
+    "local_raw_jsonl_sha256": "70dacf3ad3af58f093d2fd4172d055ae096dcf14c9da83b5f781afe16b1820f4"
+  }
+}

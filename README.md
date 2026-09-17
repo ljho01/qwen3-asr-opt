@@ -9,6 +9,40 @@ The project builds on
 long-recording pipeline, independent batched streams, compiled decoding, incremental
 output persistence, native live streaming, and measured defaults for an M4 Pro.
 
+## Standard benchmark
+
+Measured on the complete English and Korean test splits of
+[Google FLEURS](https://huggingface.co/datasets/google/fleurs)
+([paper](https://arxiv.org/abs/2205.12446)), a public 102-language CC-BY benchmark used by the
+[official Qwen3-ASR evaluation](https://github.com/QwenLM/Qwen3-ASR#evaluation) and the
+[Hugging Face Open ASR Leaderboard](https://github.com/huggingface/open_asr_leaderboard).
+
+| FLEURS test split | Samples | Audio | Primary error rate ↓ |
+|---|---:|---:|---:|
+| English `en_us` | 647 | 106.5 min | **4.20% WER** |
+| Korean `ko_kr` | 382 | 80.1 min | **4.39% CER** |
+
+The q8 model processed all 3.11 hours in 308.23 seconds: **0.0275 RTF / 36.31× real
+time**, with no truncated samples. This is a local M4 Pro batch-4 throughput measurement,
+using the compiled greedy decoder, forced known-language hints, two excluded warmup
+batches, AC power, and the default macOS power mode. WER/CER
+uses corpus-level edit counts after NFKC, case folding, punctuation deletion, and whitespace
+normalization; Korean CER additionally removes spaces. The dataset revision, source/model
+hashes, error counts, runtime versions, memory peaks, and validity limits are in the
+[machine-readable result](benchmarks/fleurs-test-q8-m4-pro.json).
+
+Reproduce the full run without committing model or dataset files:
+
+```sh
+uv run python scripts/prepare_fleurs.py --output data/fleurs-test
+
+./asr bench --manifest data/fleurs-test/manifest.jsonl \
+  --model models/q8 --output outputs/fleurs-test-q8.json \
+  --decoder compiled --cache-mb 256 --batch-size 4 \
+  --batch-prefill serial --dense-prefill off \
+  --warmup 2 --repeats 1 --language-hint
+```
+
 ## Requirements
 
 - Apple Silicon Mac
@@ -130,7 +164,7 @@ tail, so the event log grows linearly during long sessions. The fixed profile us
 English decode chunks. Korean may need the second chunk before the first stable commit;
 the first chunk can still produce a draft.
 
-## Measured M4 Pro result
+## Long-file M4 Pro result
 
 | Item | Result |
 |---|---:|
@@ -160,7 +194,7 @@ uv run python -m pytest -q
 uv run ruff check src tests scripts
 ```
 
-The release contains 450 passing tests covering decoding, batching, bounded KV growth,
+The release contains 452 passing tests covering decoding, batching, bounded KV growth,
 long-file and live output persistence, model conversion, metrics, optional VAD, and
 experimental paths retained for reproducibility.
 

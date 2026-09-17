@@ -1,6 +1,6 @@
 [project]
 name = "qwen3-asr-opt"
-version = "0.2.0"
+version = "0.2.1"
 description = "Measured Qwen3-ASR 1.7B optimization for Apple Silicon"
 readme = "README.md"
 license = "Apache-2.0"
@@ -11,6 +11,7 @@ dependencies = [
   "jiwer>=4",
   "pyarrow>=18",
   "httpx>=0.28",
+  "huggingface-hub>=0.34,<2",
   "psutil>=7",
 ]
 

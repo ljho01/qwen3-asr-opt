@@ -456,10 +456,11 @@ wheels = [
 
 [[package]]
 name = "qwen3-asr-opt"
-version = "0.2.0"
+version = "0.2.1"
 source = { editable = "." }
 dependencies = [
     { name = "httpx" },
+    { name = "huggingface-hub" },
     { name = "jiwer" },
     { name = "mlx-qwen3-asr" },
     { name = "psutil" },
@@ -485,6 +486,7 @@ dev = [
 requires-dist = [
     { name = "coremltools", marker = "extra == 'coreml'", specifier = "==9.0" },
     { name = "httpx", specifier = ">=0.28" },
+    { name = "huggingface-hub", specifier = ">=0.34,<2" },
     { name = "jiwer", specifier = ">=4" },
     { name = "mlx-qwen3-asr", specifier = "==0.4.0" },
     { name = "onnxruntime", marker = "extra == 'vad'", specifier = "==1.30.0" },
