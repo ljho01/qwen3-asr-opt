@@ -92,6 +92,11 @@ def load_session(path: str, dtype: str = "float16") -> Session:
     model.load_weights(list(weights.items()), strict=True)
     model.eval()
     mx.eval(model.parameters())
+    # Upstream tail refinement resolves the tokenizer through model origin
+    # metadata. Preserve the local converted checkpoint path so finalization
+    # never falls back to the default remote model.
+    model._resolved_model_path = str(root.resolve())
+    model._source_model_id = metadata.get("source")
     # Quantized scales and non-quantized weights were saved as float16.
     if dtype != metadata["float_dtype"]:
         raise ValueError("Converted checkpoint requires dtype=float16")
