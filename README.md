@@ -43,6 +43,51 @@ uv run python scripts/prepare_fleurs.py --output data/fleurs-test
   --warmup 2 --repeats 1 --language-hint
 ```
 
+## FP16 and stock q8 comparison
+
+The following paired run compares the official FP16 checkpoint, the same q8 checkpoint
+with the upstream stock decoder, and this project's compiled batch-4 path. It uses the
+first 32 source rows from each FLEURS test locale, fixed before decoding: 64 clips and
+11.88 minutes of audio. These smaller quality columns are diagnostic; the full-test
+quality result above remains the primary score.
+
+| MLX path | Batch | English WER ↓ | Korean CER ↓ | Throughput ↑ | Mean system W | Gross J / audio min ↓ | MLX peak |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Official FP16 + stock decoder | 1 | 4.70% | 2.67% | 11.89× | 49.55 W | 250.11 J | 4.40 GiB |
+| q8 + stock decoder | 1 | 4.56% | 2.67% | 17.62× | 56.83 W | 193.56 J | 2.48 GiB |
+| q8 + compiled decoder | 4 | 4.56% | 2.67% | **29.35×** | 66.57 W | **136.11 J** | 2.79 GiB |
+
+The optimized path produced exactly the same transcript as q8 stock for all 64 clips. It
+was 1.67× as fast and used 29.7% less gross system energy per audio minute. Relative to
+FP16 stock it was 2.47× as fast, used 45.6% less energy per audio minute, and reduced peak
+MLX allocation by 36.7%. Batch 4 raises instantaneous power and uses 12.2% more peak MLX
+memory than q8 stock, but its shorter runtime lowers total energy.
+
+Power is the raw Apple SMC `PSTR` total-system estimate sampled every 250 ms with 100%
+measurement-window coverage. It is neither wall-outlet nor per-process power. All three
+paths ran sequentially on AC power in the default macOS power mode; model loading and two
+warmup batches were excluded. This is one run per path, so execution order, residual heat,
+the display, and background desktop work remain sources of uncertainty. The exact sample
+IDs, model and data hashes, idle diagnostics, raw-evidence hashes, and unrounded values are
+in the [machine-readable comparison](benchmarks/fleurs-test-variant-comparison-m4-pro.json).
+
+Reproduce the timing and accuracy portion after preparing the full test data above:
+
+```sh
+./asr bench --manifest data/fleurs-test/manifest.jsonl --limit 32 \
+  --model models/original --output outputs/fp16-stock.json \
+  --decoder stock --batch-size 1 --warmup 2 --language-hint
+
+./asr bench --manifest data/fleurs-test/manifest.jsonl --limit 32 \
+  --model models/q8 --output outputs/q8-stock.json \
+  --decoder stock --batch-size 1 --warmup 2 --language-hint
+
+./asr bench --manifest data/fleurs-test/manifest.jsonl --limit 32 \
+  --model models/q8 --output outputs/q8-optimized-b4.json \
+  --decoder compiled --cache-mb 256 --batch-size 4 \
+  --batch-prefill serial --dense-prefill off --warmup 2 --language-hint
+```
+
 ## Requirements
 
 - Apple Silicon Mac

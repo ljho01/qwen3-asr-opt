@@ -1,0 +1,373 @@
+{
+  "schema": "qwen-asr-opt-variant-comparison-v1",
+  "created_at": "2026-09-17T18:10:58.970176+00:00",
+  "dataset": {
+    "name": "google/fleurs",
+    "revision": "168de341b3db6859a9bac1c50a2ef5e3b47647e0",
+    "split": "test",
+    "selection": "first 32 source-Parquet rows per locale, fixed before decoding; report-only test subset",
+    "samples": 64,
+    "audio_s": 712.5400000000001,
+    "content_sha256": "184b170b4bead035bc3330fa117641159647d50b6eb01d8fb31cbc14fa582b3c",
+    "locales": {
+      "en_us": {
+        "samples": 32,
+        "audio_s": 304.53999999999996,
+        "row_indices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "source_ids": [
+          1904,
+          1675,
+          1950,
+          1728,
+          1972,
+          1938,
+          1876,
+          1914,
+          1846,
+          1806,
+          1776,
+          1729,
+          1855,
+          1919,
+          1802,
+          1711,
+          1685,
+          1992,
+          2005,
+          1982,
+          1674,
+          1952,
+          1752,
+          1749,
+          1705,
+          1662,
+          1729,
+          1790,
+          1858,
+          1789,
+          1909,
+          1897
+        ]
+      },
+      "ko_kr": {
+        "samples": 32,
+        "audio_s": 407.99999999999994,
+        "row_indices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "source_ids": [
+          1883,
+          1929,
+          1701,
+          2000,
+          1801,
+          1662,
+          1705,
+          1959,
+          1715,
+          1907,
+          1850,
+          1702,
+          1826,
+          1743,
+          1993,
+          1829,
+          1992,
+          1742,
+          1907,
+          1849,
+          1709,
+          1845,
+          1674,
+          1765,
+          1677,
+          1662,
+          1716,
+          1757,
+          1708,
+          1771,
+          1996,
+          1910
+        ]
+      }
+    },
+    "source_parquet_sha256": {
+      "en_us": "6428a4d04d3aac29e16b45e039bb1470a8bd7aa334cf92f7984c9c520d1f234d",
+      "ko_kr": "1a8319fc61c7996e8c15acde633786de97054e28ae1e463eb13901716176a7ec"
+    }
+  },
+  "models": {
+    "source": {
+      "name": "Qwen/Qwen3-ASR-1.7B",
+      "revision": "7278e1e70fe206f11671096ffdd38061171dd6e5"
+    },
+    "fp16": {
+      "profile": "official float16 checkpoint",
+      "weight_shard_sha256": [
+        "a4cd1f1a04d90b757dc7f7dd26254e69a013b19e80efe590a83c6a3bde8608d6",
+        "6e0b9d9e09e2e0238e7ef3cc8a484ab387e91b90f1900bedf88bc92d7929ccfc"
+      ]
+    },
+    "q8": {
+      "profile": "affine 8-bit, group-size 64, converted from the same source revision",
+      "weights_sha256": "eba2bdb1ec74f5df99345f9f81492ba551f6b072eedfef564b353ef0dde90bb8"
+    }
+  },
+  "runtime": {
+    "backend": "mlx-qwen3-asr 0.4.0",
+    "mlx": "0.32.2",
+    "python": "3.12.13",
+    "dtype": "float16",
+    "language_hint": true,
+    "warmup_batches": 2,
+    "model_load_and_warmup_excluded": true,
+    "runs_per_variant": 1,
+    "execution": "sequential in listed order",
+    "order": [
+      "fp16_stock",
+      "q8_stock",
+      "q8_optimized_b4"
+    ],
+    "benchmark_code_commit": "5303f31e5c7558fc1435426099342cec8cd15182"
+  },
+  "hardware": {
+    "chip": "Apple M4 Pro",
+    "cpu_cores": 12,
+    "gpu_cores": 16,
+    "memory_bytes": 25769803776,
+    "os": "macOS 27.0",
+    "power_source": "AC Power",
+    "power_mode": 0
+  },
+  "power_measurement": {
+    "sensor": "Apple SMC PSTR",
+    "sampler_interval_ms": 250,
+    "sampler_source_sha256": "13c447c03054a8843484292db1d3654dfc9485400881d501b92a3d16189a469a",
+    "sampler_binary_sha256": "489cd92c0ad7533ad9244ca3690999f3b7edad301a84c778f0599b1447709ef4",
+    "scope": "sampled total-system estimate; not wall-outlet or per-process energy",
+    "primary_energy": "gross joules per audio minute",
+    "idle_note": "idle-adjusted values are diagnostic because each pre-run idle window differed",
+    "telemetry_parse_errors": 0
+  },
+  "scoring": {
+    "normalization": "NFKC, Unicode casefold, delete Unicode punctuation, collapse whitespace",
+    "english_primary": "corpus WER",
+    "korean_primary": "corpus CER after removing spaces"
+  },
+  "results": {
+    "fp16_stock": {
+      "decoder": "stock",
+      "batch_size": 1,
+      "compute_s": 59.923806580995006,
+      "rtf": 0.08409886684395965,
+      "throughput_x": 11.890766636076552,
+      "accuracy": {
+        "English": {
+          "samples": 32,
+          "wer": 0.04700854700854701,
+          "word_errors": 33,
+          "reference_words": 702
+        },
+        "Korean": {
+          "samples": 32,
+          "cer_no_space": 0.026720106880427523,
+          "char_errors_no_space": 40,
+          "reference_chars_no_space": 1497
+        }
+      },
+      "truncated_samples": 0,
+      "mlx_peak_bytes": 4728926987,
+      "process_peak_rss_bytes": 4236476416,
+      "power": {
+        "scope": "system_smc_PSTR_raw_estimate",
+        "mean_watts": 49.5538177650681,
+        "gross_joules": 2970.2697453999904,
+        "gross_joules_per_audio_minute": 250.1139370758125,
+        "idle_watts": 14.468023799396791,
+        "idle_subtracted_joules": 2103.0523380387185,
+        "idle_subtracted_joules_per_audio_minute": 177.08920240593247,
+        "coverage": 1.0
+      }
+    },
+    "q8_stock": {
+      "decoder": "stock",
+      "batch_size": 1,
+      "compute_s": 40.428375373012386,
+      "rtf": 0.05673839415753837,
+      "throughput_x": 17.6247497809583,
+      "accuracy": {
+        "English": {
+          "samples": 32,
+          "wer": 0.045584045584045586,
+          "word_errors": 32,
+          "reference_words": 702
+        },
+        "Korean": {
+          "samples": 32,
+          "cer_no_space": 0.026720106880427523,
+          "char_errors_no_space": 40,
+          "reference_chars_no_space": 1497
+        }
+      },
+      "truncated_samples": 0,
+      "mlx_peak_bytes": 2667722760,
+      "process_peak_rss_bytes": 2343649280,
+      "power": {
+        "scope": "system_smc_PSTR_raw_estimate",
+        "mean_watts": 56.826690113768784,
+        "gross_joules": 2298.6417178351553,
+        "gross_joules_per_audio_minute": 193.5589624022642,
+        "idle_watts": 24.841257793458983,
+        "idle_subtracted_joules": 1293.8119208995213,
+        "idle_subtracted_joules_per_audio_minute": 108.94646651973403,
+        "coverage": 1.0
+      }
+    },
+    "q8_optimized_b4": {
+      "decoder": "compiled",
+      "batch_size": 4,
+      "compute_s": 24.27542245999939,
+      "rtf": 0.03406885572739691,
+      "throughput_x": 29.352321310745907,
+      "accuracy": {
+        "English": {
+          "samples": 32,
+          "wer": 0.045584045584045586,
+          "word_errors": 32,
+          "reference_words": 702
+        },
+        "Korean": {
+          "samples": 32,
+          "cer_no_space": 0.026720106880427523,
+          "char_errors_no_space": 40,
+          "reference_chars_no_space": 1497
+        }
+      },
+      "truncated_samples": 0,
+      "mlx_peak_bytes": 2993459318,
+      "process_peak_rss_bytes": 2355937280,
+      "power": {
+        "scope": "system_smc_PSTR_raw_estimate",
+        "mean_watts": 66.56797879716754,
+        "gross_joules": 1616.411997767278,
+        "gross_joules_per_audio_minute": 136.11126374103446,
+        "idle_watts": 27.444184820580677,
+        "idle_subtracted_joules": 950.0088649923232,
+        "idle_subtracted_joules_per_audio_minute": 79.99625550781626,
+        "coverage": 1.0
+      }
+    }
+  },
+  "paired_outputs": {
+    "q8_stock_vs_q8_optimized_b4_text_matches": 64,
+    "q8_stock_vs_q8_optimized_b4_text_mismatches": 0,
+    "fp16_stock_vs_q8_optimized_b4_text_matches": 59,
+    "fp16_stock_vs_q8_optimized_b4_text_mismatches": 5
+  },
+  "relative_to_q8_optimized_b4": {
+    "vs_fp16_stock": {
+      "speedup": 2.468496961473539,
+      "compute_time_reduction": 0.5948951869873633,
+      "gross_energy_per_audio_minute_reduction": 0.45580296191260417,
+      "mlx_peak_reduction": 0.3669897365239232
+    },
+    "vs_q8_stock": {
+      "speedup": 1.6654035759678145,
+      "compute_time_reduction": 0.3995449424810614,
+      "gross_energy_per_audio_minute_reduction": 0.29679689304098966,
+      "mlx_peak_change": 0.12210285224691031
+    }
+  },
+  "validity": {
+    "timing_conditions_valid": true,
+    "power_coverage": {
+      "fp16_stock": 1.0,
+      "q8_stock": 1.0,
+      "q8_optimized_b4": 1.0
+    },
+    "truncated_samples": {
+      "fp16_stock": 0,
+      "q8_stock": 0,
+      "q8_optimized_b4": 0
+    },
+    "source_changed_during_run": {
+      "fp16_stock": [],
+      "q8_stock": [],
+      "q8_optimized_b4": []
+    },
+    "limits": "One sequential run per variant on a desktop system. Order, residual heat, display and background load can affect timing and system power. The 64-sample quality columns are diagnostic; use the full-test table for the project quality claim."
+  },
+  "evidence": {
+    "local_raw_report_sha256": {
+      "fp16_stock": "3b3f26afdb4adc9b9a005559c4302d9d797ca099c4a41cdd7b7aeecd4c519f7a",
+      "q8_stock": "c39f5daf9f1c52780e90740bd4f3b4c480bbcb9774858ab1ff837d35d30f9d35",
+      "q8_optimized_b4": "bbb8c3c96c8e541679b44dd0ae9e9f2b3863580471ee5c5d26a8e074e8398fdc"
+    },
+    "local_raw_smc_jsonl_sha256": "be55e9bb441a05538639edb8f81b2816d5409d797ae5eb73dc034e768771716c",
+    "local_raw_smc_sample_count": 607
+  }
+}
