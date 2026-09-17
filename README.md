@@ -1,13 +1,13 @@
 # qwen3-asr-opt
 
 Fast local Korean and English transcription with Qwen3-ASR 1.7B on Apple Silicon.
-The default long-file profile uses an MLX encoder, an 8-bit model, compiled greedy
-decoding, continuous batch scheduling, and a growing KV cache.
+It provides two fixed q8/MLX modes: a high-throughput final pass for long recordings and
+bounded-memory live captions with stable-prefix updates.
 
 The project builds on
 [`mlx-qwen3-asr`](https://github.com/moona3k/mlx-qwen3-asr) 0.4.0 and adds a bounded-memory
 long-recording pipeline, independent batched streams, compiled decoding, incremental
-output persistence, and measured defaults for an M4 Pro.
+output persistence, native live streaming, and measured defaults for an M4 Pro.
 
 ## Requirements
 
@@ -50,7 +50,18 @@ weights used for the measurements below have SHA-256:
 eba2bdb1ec74f5df99345f9f81492ba551f6b072eedfef564b353ef0dde90bb8
 ```
 
-## Transcribe
+## Choose a mode
+
+| Mode | Command | Use it for |
+|---|---|---|
+| Long recording | `./transcribe-final ...` | Best final transcript from a completed file |
+| Live captions | `./asr live ...` | Microphone captions or real-time file playback |
+
+Both modes run locally. The live path displays a quickly changing draft and separately
+commits stable text. Run the long-recording path on the saved audio when final transcript
+quality matters most.
+
+## Long recordings
 
 The fixed long-recording profile is the easiest entry point:
 
@@ -76,6 +87,48 @@ The launcher expands to the following explicit configuration:
   --chunk-seconds 30 --cache-mb 256 --batch-prefill serial \
   --dense-prefill off --audio-prefetch 0
 ```
+
+## Live captions
+
+List the macOS AVFoundation capture devices, then start the microphone by index or name:
+
+```sh
+ffmpeg -f avfoundation -list_devices true -i ""
+
+./asr live --microphone 0 --language Korean \
+  --output "/path/to/live.json"
+```
+
+The model is loaded and the compiled streaming path is warmed before the microphone is
+opened. Press `Ctrl-C` to stop; the remaining audio is finalized before the command exits.
+Use `English` for English speech.
+
+A file can be delivered to the same decoder at real-time speed:
+
+```sh
+./asr live "/path/to/recording.m4a" --language English \
+  --output "/path/to/live.json"
+```
+
+Add `--unpaced` to exercise the streaming decoder as fast as the Mac can run it. For an
+existing live source, send raw 16 kHz mono signed PCM16 on standard input:
+
+```sh
+audio-producer | ./asr live - --language Korean --format jsonl
+```
+
+Text output uses these records:
+
+- `[draft]` is the current two-token tail and may change.
+- `[stable]` contains only newly committed text.
+- `[final]` is emitted once after accuracy-oriented tail finalization.
+
+With `--output live.json`, the command also writes `live.txt` and the append-only
+`live.events.jsonl`. Update events contain stable deltas and only the short provisional
+tail, so the event log grows linearly during long sessions. The fixed profile uses a
+0.2-second input tick, a 30-second bounded context, and 2.5-second Korean or 2.4-second
+English decode chunks. Korean may need the second chunk before the first stable commit;
+the first chunk can still produce a draft.
 
 ## Measured M4 Pro result
 
@@ -107,9 +160,9 @@ uv run python -m pytest -q
 uv run ruff check src tests scripts
 ```
 
-The release contains 445 passing tests covering decoding, batching, bounded KV growth,
-long-file output persistence, model conversion, metrics, optional VAD, and experimental
-paths retained for reproducibility.
+The release contains 450 passing tests covering decoding, batching, bounded KV growth,
+long-file and live output persistence, model conversion, metrics, optional VAD, and
+experimental paths retained for reproducibility.
 
 ## License
 

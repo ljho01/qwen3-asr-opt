@@ -60,6 +60,23 @@ def main():
     transcribe.add_argument("--vad-model", type=Path, help="Pinned Silero model directory for --segmenter vad")
     transcribe.add_argument("--audio-prefetch", type=int, choices=range(9), default=0,
                             help="Prepare this many --long audio chunks ahead on one CPU worker (measured:2)")
+    live = sub.add_parser("live", help="Transcribe a file or microphone as live audio")
+    live.add_argument("audio", nargs="?", help="Audio file, or - for raw 16 kHz mono PCM16 stdin")
+    live.add_argument("--microphone", metavar="DEVICE",
+                      help="macOS AVFoundation audio device index or name")
+    live.add_argument("--language", choices=["Korean", "English"], required=True)
+    live.add_argument("--model", type=Path, help="Local checkpoint; default: models/q8")
+    live.add_argument("--output", type=Path,
+                      help="New summary JSON path; also writes .txt and .events.jsonl")
+    live.add_argument("--format", choices=["text", "jsonl"], default="text")
+    live.add_argument("--input-tick-seconds", type=float, default=0.2)
+    live.add_argument("--chunk-seconds", type=float,
+                      help="Default: 2.5 for Korean, 2.4 for English")
+    live.add_argument("--max-context-seconds", type=float, default=30.0)
+    live.add_argument("--unpaced", action="store_true",
+                      help="Process file input as fast as possible instead of real-time pacing")
+    live.add_argument("--warmup", action=argparse.BooleanOptionalAction, default=True,
+                      help="Compile the streaming path before audio starts (default: enabled)")
     args = parser.parse_args()
     if args.command == "convert":
         from .runtime import convert as convert_model
@@ -78,6 +95,48 @@ def main():
             reasons = ", ".join(report["timing_validity"]["reasons"])
             parser.exit(2, f"Performance comparison invalid ({reasons}). "
                            f"Transcripts and raw measurements saved to {args.output}\n")
+    elif args.command == "live":
+        from .live import transcribe_live, validate_output
+        from .optimizations import configure
+        from .runtime import load_session
+
+        if (args.audio is None) == (args.microphone is None):
+            parser.error("live requires exactly one audio input or --microphone")
+        if args.audio not in (None, "-") and not Path(args.audio).is_file():
+            parser.error(f"Audio file not found: {args.audio}")
+        if args.input_tick_seconds <= 0:
+            parser.error("--input-tick-seconds must be positive")
+        default_chunk = 2.5 if args.language == "Korean" else 2.4
+        chunk_seconds = args.chunk_seconds or default_chunk
+        if chunk_seconds <= 0 or args.max_context_seconds < chunk_seconds:
+            parser.error("--chunk-seconds must be positive and no larger than --max-context-seconds")
+        try:
+            validate_output(args.output)
+        except FileExistsError as error:
+            parser.error(str(error))
+        model_root = Path(os.environ.get(
+            "QWEN_ASR_MODEL_DIR", str(Path(__file__).resolve().parents[2] / "models")
+        ))
+        model = (args.model or model_root / "q8").resolve()
+        if not model.is_dir():
+            parser.error(f"Local checkpoint not found: {model}; see README setup/conversion")
+        configure("compiled", 256)
+        session = load_session(str(model))
+        session.model._batch_prefill_mode = "serial"
+        transcribe_live(
+            session,
+            model,
+            args.audio,
+            language=args.language,
+            microphone=args.microphone,
+            output=args.output,
+            output_format=args.format,
+            tick_seconds=args.input_tick_seconds,
+            chunk_seconds=chunk_seconds,
+            max_context_seconds=args.max_context_seconds,
+            paced=not args.unpaced,
+            warmup=args.warmup,
+        )
     else:
         from .optimizations import configure
         from .runtime import load_session

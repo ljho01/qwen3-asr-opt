@@ -1,6 +1,6 @@
 [project]
 name = "qwen3-asr-opt"
-version = "0.1.0"
+version = "0.2.0"
 description = "Measured Qwen3-ASR 1.7B optimization for Apple Silicon"
 readme = "README.md"
 license = "Apache-2.0"
