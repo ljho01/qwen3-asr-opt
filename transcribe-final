@@ -1,0 +1,18 @@
+#!/bin/sh
+# Final Korean/English file profile, fixed on 2026-09-17.
+set -eu
+if [ "$#" -ne 3 ]; then
+  echo 'Usage: transcribe-final INPUT_AUDIO Korean|English NEW_OUTPUT.json' >&2
+  exit 2
+fi
+case "$2" in
+  Korean|English) ;;
+  *) echo 'Language must be Korean or English' >&2; exit 2 ;;
+esac
+task_root=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
+exec env UV_NO_SYNC=1 QWEN_ASR_MODEL_DIR="$task_root/models" \
+  "$task_root/asr" transcribe "$1" --language "$2" --output "$3" \
+  --preset quality --long --decoder compiled --batch-size 4 \
+  --batch-scheduler continuous --kv-cache growing --segmenter energy \
+  --chunk-seconds 30 --cache-mb 256 --batch-prefill serial \
+  --dense-prefill off --audio-prefetch 0

@@ -1,0 +1,48 @@
+[project]
+name = "qwen3-asr-opt"
+version = "0.1.0"
+description = "Measured Qwen3-ASR 1.7B optimization for Apple Silicon"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "mlx-qwen3-asr==0.4.0",
+  "soundfile>=0.13",
+  "jiwer>=4",
+  "pyarrow>=18",
+  "httpx>=0.28",
+  "psutil>=7",
+]
+
+[project.optional-dependencies]
+coreml = ["coremltools==9.0"]
+vad = ["onnxruntime==1.30.0"]
+
+[dependency-groups]
+dev = ["pytest>=8", "ruff>=0.12"]
+
+[project.scripts]
+qwen-asr = "qwen_asr_opt.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/ljho01/qwen3-asr-opt"
+Repository = "https://github.com/ljho01/qwen3-asr-opt"
+Issues = "https://github.com/ljho01/qwen3-asr-opt/issues"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/qwen_asr_opt"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"src/qwen_asr_opt/native/mlx_qmm_v0322.h" = "qwen_asr_opt/native/mlx_qmm_v0322.h"
+"src/qwen_asr_opt/native/mlx_qmm_LICENSE" = "qwen_asr_opt/native/mlx_qmm_LICENSE"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]

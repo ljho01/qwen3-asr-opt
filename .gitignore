@@ -1,0 +1,25 @@
+.DS_Store
+.python-version
+.pytest_cache/
+.ruff_cache/
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# Local models, datasets, transcripts, and benchmark captures
+models/
+data/
+outputs/
+artifacts/
+profiling/
+*.jsonl
+*.safetensors
+*.mlpackage/
+*.mlmodelc/
+*.wav
+*.flac
+*.m4a
+*.mp3
